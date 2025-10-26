@@ -97,6 +97,10 @@ PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.service.bdroid.soc.alwayson=true \
     ro.vendor.bluetooth.csip_qti=true
 
+PRODUCT_PRODUCT_PROPERTIES += \
+    bluetooth.hfp.codec_aptx_voice.enabled=false \
+    bluetooth.hfp.swb.aptx.power_management.enabled=false
+
 # Camera
 $(call inherit-product-if-exists, vendor/xiaomi/camera/miuicamera.mk)
 
