@@ -53,6 +53,10 @@
     <!-- If true, the display will be shifted around in ambient mode. -->
     <bool name="config_enableBurnInProtection">true</bool>
 
+    <!-- Don't shift the whole display in ambient mode, only SystemUI views. Keeps overlays
+         anchored to the physical cutout at (0,0). -->
+    <bool name="config_burnInProtectionUseDisplayOffset">false</bool>
+
     <!-- Specifies the maximum burn-in offset displacement from the center. If -1, no maximum value
          will be used. -->
     <integer name="config_burnInProtectionMaxRadius">70</integer>
