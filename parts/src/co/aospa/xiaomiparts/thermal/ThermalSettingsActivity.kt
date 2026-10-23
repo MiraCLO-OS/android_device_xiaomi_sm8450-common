@@ -13,22 +13,27 @@ import android.view.MenuItem
 import co.aospa.xiaomiparts.R
 import co.aospa.xiaomiparts.utils.dlog
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity
+import com.android.settingslib.widget.ExpressiveDesignEnabledProvider
 
 /** Thermal profile settings activity. */
-class ThermalSettingsActivity : CollapsingToolbarBaseActivity() {
+class ThermalSettingsActivity : CollapsingToolbarBaseActivity(), ExpressiveDesignEnabledProvider {
+
+    override fun isExpressiveDesignEnabled() = true
 
     private lateinit var thermalUtils: ThermalUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragmentManager
-            .beginTransaction()
-            .replace(
-                com.android.settingslib.collapsingtoolbar.R.id.content_frame,
-                ThermalSettingsFragment(),
-                TAG
-            )
-            .commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(
+                    com.android.settingslib.collapsingtoolbar.R.id.content_frame,
+                    ThermalSettingsFragment(),
+                    TAG
+                )
+                .commit()
+        }
         thermalUtils = ThermalUtils.getInstance(this)
     }
 

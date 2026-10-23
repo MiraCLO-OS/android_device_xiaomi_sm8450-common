@@ -10,12 +10,13 @@ import android.os.UserHandle
 import android.provider.Settings
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceFragment
+import com.android.settingslib.widget.SettingsBasePreferenceFragment
 import co.aospa.xiaomiparts.R
 import co.aospa.xiaomiparts.utils.dlog
 
 /** Double tap side-fingerprint sensor, settings fragment. */
-class GestureSettingsFragment : PreferenceFragment(), Preference.OnPreferenceChangeListener {
+class GestureSettingsFragment :
+    SettingsBasePreferenceFragment(), Preference.OnPreferenceChangeListener {
 
     private val fpDoubleTapPref by lazy { findPreference<ListPreference>(KEY_FP_DOUBLE_TAP)!! }
     private val backDoubleTapPref by lazy { findPreference<ListPreference>(KEY_BACK_DOUBLE_TAP)!! }
@@ -25,20 +26,20 @@ class GestureSettingsFragment : PreferenceFragment(), Preference.OnPreferenceCha
         addPreferencesFromResource(R.xml.gesture_settings)
 
         fpDoubleTapPref.apply {
-            isEnabled = GestureUtils.isFpDoubleTapAvailable(activity)
+            isEnabled = GestureUtils.isFpDoubleTapAvailable(requireActivity())
             onPreferenceChangeListener = this@GestureSettingsFragment
             value =
                 if (GestureUtils.isFpDoubleTapEnabled(context))
-                    GestureUtils.getFpDoubleTapAction(activity).toString()
+                    GestureUtils.getFpDoubleTapAction(requireActivity()).toString()
                 else "0"
             if (!isEnabled) {
-                summary = context.getString(R.string.gesture_unavailable)
+                summary = requireContext().getString(R.string.gesture_unavailable)
             }
         }
 
-        val isBackTapAvailable = GestureUtils.isBackTapAvailable(context)
+        val isBackTapAvailable = GestureUtils.isBackTapAvailable(requireContext())
         val backTapSummary =
-            if (isBackTapAvailable) "%s" else context.getString(R.string.gesture_unavailable)
+            if (isBackTapAvailable) "%s" else requireContext().getString(R.string.gesture_unavailable)
 
         backDoubleTapPref.apply {
             isEnabled = isBackTapAvailable
@@ -58,13 +59,13 @@ class GestureSettingsFragment : PreferenceFragment(), Preference.OnPreferenceCha
                 val enabled = action > 0
                 dlog(TAG, "onPreferenceChange: action=$action")
                 Settings.System.putIntForUser(
-                    activity.contentResolver,
+                    requireActivity().contentResolver,
                     GestureUtils.SETTING_KEY_FP_DOUBLE_TAP_ENABLE,
                     if (enabled) 1 else 0,
                     UserHandle.USER_CURRENT,
                 )
                 Settings.System.putIntForUser(
-                    activity.contentResolver,
+                    requireActivity().contentResolver,
                     GestureUtils.SETTING_KEY_FP_DOUBLE_TAP_ACTION,
                     action,
                     UserHandle.USER_CURRENT,

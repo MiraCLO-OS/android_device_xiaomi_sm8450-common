@@ -28,7 +28,7 @@ private constructor(
     private val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
     private val serviceIntent = Intent(context, ThermalService::class.java)
 
-    var enabled: Boolean = sharedPrefs.getBoolean(THERMAL_ENABLED, false)
+    @Volatile var enabled: Boolean = sharedPrefs.getBoolean(THERMAL_ENABLED, false)
         set(value) {
             if (field == value) return
             field = value
@@ -41,11 +41,12 @@ private constructor(
             }
         }
 
-    var value: String = readValue()
+    @Volatile var value: String = readValue()
         set(value) {
             if (field == value) return
             field = value
             writeValue(value)
+            startService()
         }
 
     fun startService() {
@@ -68,17 +69,32 @@ private constructor(
     private fun readValue(): String = sharedPrefs.getString(THERMAL_CONTROL, null) ?: DEFAULT_VALUE
 
     fun writePackage(packageName: String, mode: Int) {
+        if (packageName.isEmpty() || ThermalState.values().none { it.id == mode }) return
         dlog(TAG, "writePackage: $packageName -> $mode")
-        var newValue = value.replace("$packageName,", "")
-        val modes = newValue.split(":").toMutableList()
-        modes[mode] += "$packageName,"
-        value = modes.joinToString(":")
+        val profiles = readProfiles()
+        profiles.forEach { packages -> packages.removeAll { it == packageName } }
+        profiles[mode].add(packageName)
+        value = ThermalState.values().joinToString(":") { state ->
+            state.prefix + profiles[state.id].joinToString("") { "$it," }
+        }
     }
 
     fun getStateForPackage(packageName: String): ThermalState {
-        val modes = value.split(":")
-        return ThermalState.values().find { state -> modes[state.id].contains("$packageName,") }
+        val profiles = readProfiles()
+        return ThermalState.values().find { state -> packageName in profiles[state.id] }
             ?: getDefaultStateForPackage(packageName)
+    }
+
+    private fun readProfiles(): List<MutableList<String>> {
+        val modes = value.split(":")
+        return ThermalState.values().map { state ->
+            modes.firstOrNull { it.startsWith(state.prefix) }
+                ?.removePrefix(state.prefix)
+                ?.split(",")
+                ?.filter { it.isNotEmpty() }
+                ?.toMutableList()
+                ?: mutableListOf()
+        }
     }
 
     fun resetProfiles() {
@@ -92,6 +108,7 @@ private constructor(
     }
 
     fun setThermalProfile(packageName: String) {
+        if (!enabled) return
         if (packageName.isEmpty()) {
             dlog(TAG, "setThermalProfile: packageName is empty")
             return

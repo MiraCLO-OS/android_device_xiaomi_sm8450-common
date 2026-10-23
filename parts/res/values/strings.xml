@@ -11,9 +11,12 @@
 
     <!-- Thermal Profiles -->
     <string name="thermal_title">Thermal profiles</string>
+    <string name="thermal_intro">Choose how your phone balances performance and temperature for each app.</string>
     <string name="thermal_enable">Use thermal profiles</string>
     <string name="thermal_summary">Per-app thermal profile configuration</string>
     <string name="thermal_loading">Loading...</string>
+    <string name="thermal_loading_failed">Couldn\'t load apps. Tap to retry.</string>
+    <string name="thermal_profile_for_app">Thermal profile for %1$s</string>
     <string name="thermal_default">Default</string>
     <string name="thermal_benchmark">Benchmark</string>
     <string name="thermal_browser">Browser</string>
@@ -28,6 +31,9 @@
 
      <!-- Gestures -->
      <string name="gestures_title">Device-specific gestures</string>
+     <string name="gestures_intro">Set quick actions for taps on the fingerprint sensor or the back of your phone.</string>
+     <string name="gesture_fingerprint_category">Fingerprint sensor</string>
+     <string name="gesture_back_category">Back of phone</string>
      <string name="gestures_summary_back_tap">Back tap</string>
      <string name="gestures_summary_fp_tap">Double tap fingerprint sensor</string>
      <string name="gestures_footer_text">
@@ -35,8 +41,12 @@
           Double tap on fingerprint sensor works only after the device is unlocked.
      </string>
      <string name="fp_double_tap_title">Double tap on fingerprint sensor to</string>
+     <string name="fp_double_tap_summary">Choose what happens when you double-tap the side sensor</string>
      <string name="back_double_tap_title">Double tap on back of phone to</string>
      <string name="back_triple_tap_title">Triple tap on back of phone to</string>
+     <string name="back_tap_summary">Choose an action for a tap on the back of your phone</string>
+     <string name="thermal_apps_title">App profiles</string>
+     <string name="thermal_apps_summary">Choose a performance profile for each app</string>
      <string name="action_off">Do nothing</string>
      <string name="action_screenshot">Take a screenshot</string>
      <string name="action_assistant">Access your digital assistant</string>
