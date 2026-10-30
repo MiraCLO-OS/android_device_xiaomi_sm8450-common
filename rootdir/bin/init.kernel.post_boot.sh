@@ -35,7 +35,8 @@ function configure_zram_parameters() {
 	MemTotal=${MemTotalStr:16:8}
 
 	# Zram disk - 75% for Go and < 2GB devices .
-	# For >2GB Non-Go devices, size = 50% of RAM size. Limit the size to 4GB.
+	# MiraCLO: for >2GB devices, size = 60% of RAM size, limited to 6GB, so more
+	# apps stay in memory (multi-gen LRU decides what to swap).
 	# And enable lz4 zram compression for all targets.
 
 	let RamSizeGB="( $MemTotal / 1048576 ) + 1"
@@ -43,12 +44,12 @@ function configure_zram_parameters() {
 	if [ $RamSizeGB -le 2 ]; then
 		let zRamSizeMB="( $RamSizeGB * 1024 ) * 3 / 4"
 	else
-		let zRamSizeMB="( $RamSizeGB * 1024 ) / 2"
+		let zRamSizeMB="( $RamSizeGB * 1024 ) * 3 / 5"
 	fi
 
 	# use MB avoid 32 bit overflow
-	if [ $zRamSizeMB -gt 4096 ]; then
-		let zRamSizeMB=4096
+	if [ $zRamSizeMB -gt 6144 ]; then
+		let zRamSizeMB=6144
 	fi
 
 	echo lz4 > /sys/block/zram0/comp_algorithm
@@ -82,13 +83,9 @@ function configure_read_ahead_kb_values() {
 	# /sys/block/dm-0/queue/read_ahead_kb to /sys/block/dm-10/queue/read_ahead_kb
 	# /sys/block/sda/queue/read_ahead_kb to /sys/block/sdh/queue/read_ahead_kb
 
-	# Set 128 for <= 4GB &
-	# set 512 for >= 5GB targets.
-	if [ $MemTotal -le 4194304 ]; then
-		ra_kb=128
-	else
-		ra_kb=512
-	fi
+	# MiraCLO: 128 for all targets. App launches read in small random chunks
+	# on UFS; a larger read-ahead only wastes I/O and page cache.
+	ra_kb=128
 	if [ -f /sys/block/mmcblk0/bdi/read_ahead_kb ]; then
 		echo $ra_kb > /sys/block/mmcblk0/bdi/read_ahead_kb
 	fi
